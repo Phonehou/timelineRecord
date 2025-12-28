@@ -9,7 +9,7 @@ Page({
     originFiles: [],
     summary: '',
     tags: [],
-    location: '',
+    location: null,
     events: [],
 
     // ===== UI 配置（复用发布页）=====
@@ -27,6 +27,25 @@ Page({
     this.fetchDayDetail(dayId);
   },
 
+  // computeWeekIndex(dateStr) {
+  //   const date = new Date(dateStr);
+  //   const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+  //   const dayOfYear = Math.floor((date - firstDayOfYear) / (24*60*60*1000)) + 1;
+  //   return Math.ceil(dayOfYear / 7);
+  // },
+
+  computeWeekIndex(dateStr) {
+    const date = new Date(dateStr);
+    const d = new Date(Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    ));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  },
   /** 拉取 Day 详情 */
   async fetchDayDetail(dayId) {
   try {
@@ -48,6 +67,12 @@ Page({
 
     const day = result.data || {};
 
+    // 保存快照
+    this._backup = {
+      day: { ...day },
+      events: day.events.map(e => ({ ...e }))
+    };
+
     this.setData({
       originFiles: (day.images || []).map(i => ({
         url: i.url,
@@ -56,7 +81,11 @@ Page({
       })),
       summary: day.summary || '',
       tags: day.tags || [],
-      location: day.location || '',
+      location: day.location || null,
+      date: day.date || '',
+      //weekIndex: day.weekIndex || 0,
+      weekIndex: day.weekIndex || this.computeWeekIndex(day.date),
+      dayLabel: day.dayLabel || '',
       events: day.events || [],
     });
     } catch (err) {
@@ -66,6 +95,72 @@ Page({
         icon: 'none',
       });
     }
+  },
+
+  buildDayDiff() {
+    const { summary, location, originFiles } = this.data;
+    const dayDiff = {};
+    const backup = this._backup?.day || {};
+  
+    if (summary !== backup.summary) dayDiff.summary = summary;
+    // if (location !== backup.location) dayDiff.location = location;
+    if (JSON.stringify(location) !== JSON.stringify(backup.location)) {
+      diff.location = location
+    }
+    if (JSON.stringify(originFiles) !== JSON.stringify(backup.images)) {
+      dayDiff.images = originFiles.map((f, index) => ({
+        url: f.url,
+        type: f.type || 'image',
+        order: index
+      }));
+    }
+  
+    return dayDiff;
+  },
+  
+  buildEventDiff() {
+    const { events } = this.data;
+    const backupEvents = this._backup?.events || [];
+  
+    const updates = [];
+    const deletes = [];
+  
+    events.forEach((e, index) => {
+      if (e._local?.isDeleted) {
+        if (e._id) deletes.push(e._id);
+        return;
+      }
+  
+      if (e._local?.isNew) {
+        // 新增事件
+        updates.push({
+          _local: true,
+          title: e.title || '',
+          description: e.description || '',
+          time: e.time || '',
+          status: e.status || 'todo',
+          order: index
+        });
+        return;
+      }
+  
+      // 对比已有事件
+      const backup = backupEvents.find(b => b._id === e._id);
+      if (!backup) return;
+  
+      const changed = {};
+      if (e.title !== backup.title) changed.title = e.title;
+      if (e.description !== backup.description) changed.description = e.description;
+      if (e.time !== backup.time) changed.time = e.time;
+      if (e.status !== backup.status) changed.status = e.status;
+      if (index !== backup.order) changed.order = index;
+  
+      if (Object.keys(changed).length) {
+        updates.push({ _id: e._id, ...changed });
+      }
+    });
+  
+    return { updates, deletes };
   },
 
   /** 切换编辑模式 */
@@ -90,8 +185,37 @@ Page({
     this.setData({ summary: e.detail.value });
   },
 
+  // gotoMap() {
+  //   wx.showToast({ title: '选择位置', icon: 'none' });
+  // },
   gotoMap() {
-    wx.showToast({ title: '选择位置', icon: 'none' });
+    wx.chooseLocation({
+      type: 'wgs84', // 默认为 wgs84 坐标
+      success: (res) => {
+        // res 包含 name, address, latitude, longitude
+        console.log('选中位置:', res);
+        this.setData({
+          location: {
+            name: res.name || '',
+            address: res.address || '',
+            latitude: res.latitude,
+            longitude: res.longitude
+          }
+        });
+        wx.showToast({
+          title: '位置已选择',
+          icon: 'success',
+          duration: 1500
+        });
+      },
+      fail: (err) => {
+        console.error('选择位置失败', err);
+        wx.showToast({
+          title: '取消选择',
+          icon: 'none'
+        });
+      }
+    });
   },
 
   enterEdit() {
@@ -142,36 +266,45 @@ Page({
   },
 
   async saveEdit() {
-    if (!this.hasChanged()) {
-      wx.showToast({ title: '未修改内容', icon: 'none' })
-      this.setData({ mode: 'view' })
-      return
+    const dayUpdates = this.buildDayDiff();
+    const { updates: eventUpdates, deletes: eventDeletes } = this.buildEventDiff();
+
+    if (!Object.keys(dayUpdates).length && !eventUpdates.length && !eventDeletes.length) {
+      wx.showToast({ title: '没有修改内容', icon: 'none' });
+      this.setData({ mode: 'view' });
+      return;
     }
-    if (this._saving) return
-    this._saving = true
+    //if (!this.hasChanged()) {
+    //   wx.showToast({ title: '未修改内容', icon: 'none' })
+    //   this.setData({ mode: 'view' })
+    //   return
+    // }
+    //if (this._saving) return
+    //this._saving = true
   
     wx.showLoading({ title: '保存中...' })
   
     try {
-      const { dayId, summary, location, originFiles, events } = this.data
+      // const { dayId, summary, location, originFiles, events } = this.data
   
-      const payload = {
-        dayId,
-        summary,
-        location,
-        images: originFiles,
-        events: this.buildEventsForSubmit(events)
-      }
+      // const payload = {
+      //   dayId,
+      //   summary,
+      //   location,
+      //   images: originFiles,
+      //   events: this.buildEventsForSubmit(events)
+      // }
   
       await wx.cloud.callFunction({
         name: 'update-day-with-events',
-        data: payload
+        //data: payload
+        data: { dayId: this.data.dayId, dayUpdates, eventUpdates, eventDeletes }
       })
   
       wx.showToast({ title: '已保存', icon: 'success' })
   
       this.setData({ mode: 'view' })
-      this._backup = null
+      this._backup = null  // 清理快照
   
     } catch (err) {
       console.error(err)
@@ -181,7 +314,7 @@ Page({
       })
     } finally {
       wx.hideLoading()
-      this._saving = false
+      //this._saving = false
     }
   },
 
@@ -213,7 +346,7 @@ Page({
   
     this.setData({ events });
   },
-  // 标记修改（脏标记）
+  // 事件字段修改
   onEventTitleChange(e) {
     const index = e.currentTarget.dataset.index;
     const events = this.data.events;
@@ -224,6 +357,20 @@ Page({
       isDirty: true
     };
   
+    this.setData({ events });
+  },
+  onEventDescChange(e) {
+    const index = e.currentTarget.dataset.index;
+    const events = this.data.events;
+    events[index].description = e.detail.value;
+    events[index]._local = { ...events[index]._local, isDirty: true };
+    this.setData({ events });
+  },
+  onEventTimeChange(e) {
+    const index = e.currentTarget.dataset.index;
+    const events = this.data.events;
+    events[index].time = e.detail.value;
+    events[index]._local = { ...events[index]._local, isDirty: true };
     this.setData({ events });
   }
 });

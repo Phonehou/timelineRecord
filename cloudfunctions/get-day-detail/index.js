@@ -39,7 +39,9 @@ exports.main = async (event, context) => {
     data: {
       _id: day._id,
       date: day.date,
+      weekIndex: day.weekIndex,
       dayLabel: day.dayLabel,
+      tags: day.tags || [],
       summary: day.summary || '',
       location: day.location || '',
       images: (day.images || [])

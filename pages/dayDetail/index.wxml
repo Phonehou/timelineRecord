@@ -69,12 +69,21 @@
     <view class="location box">
       <t-cell
         title="所在位置"
-        note="{{location || '未设置'}}"
+        note="{{location ? location.name : '未设置'}}"
         arrow="{{mode === 'edit'}}"
         bindtap="{{mode === 'edit' ? 'gotoMap' : ''}}"
       />
     </view>
-
+    <!-- 日期 -->
+    <view class="date box">
+      <block wx:if="{{mode === 'edit'}}">
+        <t-date-time-picker value="{{date}}" bind:change="onDateChange" />
+        <view>{{dayLabel}} · 第{{weekIndex}}周</view>
+      </block>
+      <block wx:else>
+        <t-cell title="日期" note="{{date}} · {{dayLabel}} · 第{{weekIndex}}周" />
+      </block>
+    </view>
     <t-divider content="当天事件" />
 
     <!-- 事件列表 -->

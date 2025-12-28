@@ -39,15 +39,13 @@
                 <!-- 左侧内容 -->
                 <view class="side left">
                   <block wx:if="{{index % 2 === 0}}">
-                    <view class="card">
+                    <view class="card" 
+                    bindtap="goDayDetail" data-day-id="{{item._id}}">
                       <view class="card-title">{{item.dayLabel}}</view>
 
                       <block wx:for="{{item.events}}" wx:key="_id">
                         <view class="card-item"
-                        bindtap="goDayDetail"
-                        data-day-id="{{item.dayId}}"
-                        data-event-id="{{item._id}}"
-                        >
+                                        >
                           <view class="title">{{item.title}}</view>
                           <view class="desc">{{item.description}}</view>
                         </view>
@@ -67,14 +65,13 @@
                 <!-- 右侧内容 -->
                 <view class="side right">
                   <block wx:if="{{index % 2 === 1}}">
-                    <view class="card">
+                    <view class="card"
+                    bindtap="goDayDetail" data-day-id="{{item._id}}">
                       <view class="card-title">{{item.dayLabel}}</view>
 
                       <block wx:for="{{item.events}}" wx:key="_id">
                         <view class="card-item"
-                        bindtap="goDayDetail"
-                        data-day-id="{{item.dayId}}"
-                        data-event-id="{{item._id}}">
+                       >
                           <view class="title">{{item.title}}</view>
                           <view class="desc">{{item.description}}</view>
                         </view>

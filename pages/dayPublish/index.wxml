@@ -1,0 +1,117 @@
+<t-navbar title="发布 Day" left-arrow />
+
+<view class="page">
+  <view class="day-container">
+
+    <!-- 图片上传 -->
+    <view class="upload box">
+      <t-upload
+        t-class="upload-class"
+        media-type="{{['image']}}"
+        files="{{originFiles}}"
+        gridConfig="{{gridConfig}}"
+        bind:success="handleSuccess"
+        bind:remove="handleRemove"
+        max="9"
+      />
+    </view>
+
+    <!-- 总结 -->
+    <view class="desc box">
+      <view class="desc-label">当天总结</view>
+      <t-textarea value="{{summary}}" maxlength="500" indicator bind:change="onSummaryChange" />
+    </view>
+
+    <!-- 标签 -->
+  <!-- 标签 -->
+<view class="taggroup box">
+
+<!-- 展示已有标签 -->
+<t-cell title="标签">
+  <view slot="note" class="tag-list-inline">
+    <block wx:for="{{tags}}" wx:key="index">
+      <t-check-tag
+        size="medium"
+        variant="dark"
+        checked
+        content="#{{item}}"
+      />
+    </block>
+  </view>
+</t-cell>
+
+<!-- 输入 + 添加（单独一行） -->
+<view class="tag-input-row">
+  <t-input
+    placeholder="输入标签"
+    value="{{tagInput}}"
+    bind:change="onTagInputChange"
+    clearable
+  />
+  <t-button
+    size="small"
+    theme="primary"
+    bindtap="addTag"
+  >
+    添加
+  </t-button>
+</view>
+
+</view>
+
+    <!-- 位置 -->
+    <view class="location box">
+      <t-cell title="所在位置" note="{{location ? location.name : '未设置'}}" arrow bindtap="gotoMap" />
+    </view>
+
+    <!-- 日期选择 -->
+    <view class="date box">
+      <t-cell
+        title="日期"
+        note="{{date}} · {{dayLabel}} · 第{{weekIndex}}周"
+        arrow="{{mode === 'edit'}}"
+        bindtap="showPicker"
+      />
+    </view>
+
+    <!-- 弹出日期选择器 -->
+    <t-date-time-picker
+      auto-close
+      bind:cancel="hidePicker"
+      bind:change="onPickerChange"
+      cancelBtn="取消"
+      confirmBtn="确认"
+      mode="date"
+      format="YYYY-MM-DD" 
+      start="{{pickerStart}}"
+      end="{{pickerEnd}}"
+      value="{{pickerValue}}"
+      visible="{{pickerVisible}}"
+      title="选择日期"
+    />
+
+    <t-divider content="当天事件" />
+
+    <!-- 事件列表 -->
+    <view class="events box">
+      <block wx:for="{{events}}" wx:key="_local">
+        <view class="event-item edit">
+          <t-input value="{{item.title}}" placeholder="事件标题" data-index="{{index}}" bind:change="onEventTitleChange" />
+          <t-textarea value="{{item.description}}" placeholder="事件描述" data-index="{{index}}" bind:change="onEventDescChange" />
+          <view class="event-row">
+            <t-input value="{{item.time}}" placeholder="时间" data-index="{{index}}" bind:change="onEventTimeChange" />
+            <t-button theme="danger" size="small" data-index="{{index}}" bindtap="removeEvent">删除</t-button>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <t-button theme="primary" variant="outline" bindtap="addEvent">+ 添加事件</t-button>
+
+    <!-- 发布按钮 -->
+    <view class="save-fab">
+      <t-button shape="round" theme="primary" size="large" bindtap="publishDay">发布</t-button>
+    </view>
+
+  </view>
+</view>

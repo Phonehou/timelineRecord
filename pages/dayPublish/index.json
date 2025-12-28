@@ -7,7 +7,8 @@
     "t-cell": "tdesign-miniprogram/cell/cell",
     "t-check-tag": "tdesign-miniprogram/check-tag/check-tag",
     "t-button": "tdesign-miniprogram/button/button",
-    "t-divider": "tdesign-miniprogram/divider/divider",
-    "t-date-time-picker": "tdesign-miniprogram/date-time-picker/date-time-picker"
+    "t-date-time-picker": "tdesign-miniprogram/date-time-picker/date-time-picker",
+    "t-tag": "tdesign-miniprogram/tag/tag",
+    "t-input": "tdesign-miniprogram/input/input"
   }
 }

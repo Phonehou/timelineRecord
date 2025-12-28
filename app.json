@@ -3,7 +3,8 @@
     "pages/home/index",
     "pages/message/index",
     "pages/dayDetail/index",
-    "pages/my/index"
+    "pages/my/index",
+    "pages/dayPublish/index"
   ],
   "usingComponents": {
     "t-toast": "tdesign-miniprogram/toast/toast"
@@ -92,5 +93,8 @@
   "resolveAlias": {
     "~/*": "/*"
   },
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ]
 }

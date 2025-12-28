@@ -7,6 +7,7 @@ Page({
     swiperList: [],
     cardInfo: [],
     weeks: [], // [{week:"周一", days:[{day:"12.9", events:[...]}, ...]}, ...]
+    timelineId: []
   },
 
   async onReady() {
@@ -31,17 +32,30 @@ Page({
       console.log('callFunction timelines');
       const res = await wx.cloud.callFunction({
         name: 'get-timelines',
-        data: { timelineId: 'timeline_001' }
+        data: { timelineId: '8d4e1b05695153900127d4cb2ca36cba' }
       });
+      // const res = await wx.cloud.callFunction({
+      //   name: 'get-user-timelines',
+      // });
+      // this.timelineId = res.result.data.timeline._id;
       console.log('receive timelines result', res);
+       // 如果没有返回数据，提前处理
+      if (!res.result || !res.result.data) {
+        wx.showToast({
+          title: res.result?.message || '未找到时间轴',
+          icon: 'none'
+        });
+        return;
+      }
       console.log('weeks first day info:', res.result.data.weeks[0].days[0]);
-      console.log('weeks first day images:', res.result.data.weeks[0].days[0].images);
-      res.result.data.weeks[0].days[0].imagesList = ['/static/home/card0.png', '/static/home/card1.png'];
-      res.result.data.weeks[0].days[1].imagesList = ['/static/home/card2.png'];
+      // console.log('weeks first day images:', res.result.data.weeks[0].days[0].images);
+      // res.result.data.weeks[0].days[0].imagesList = ['/static/home/card0.png', '/static/home/card1.png'];
+      // res.result.data.weeks[0].days[1].imagesList = ['/static/home/card2.png'];
       // 云函数已经返回 weeks 结构
       if (res.result && res.result.data) {
         this.setData({
           weeks: res.result.data.weeks,
+          timelineId: res.result.data.timeline?._id || '' 
         });
       }
     } catch (err) {
@@ -56,7 +70,8 @@ Page({
   },
 
   goRelease() {
-    wx.navigateTo({url:'/pages/release/index'});
+    console.log("timelineId:", this.data.timelineId);
+    wx.navigateTo({url:`/pages/dayPublish/index?timelineId=${this.data.timelineId}`});
   },
   goDayDetail(e) {
     const { dayId, eventId } = e.currentTarget.dataset;
