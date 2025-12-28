@@ -1,0 +1,173 @@
+<t-navbar
+  title="Day 详情"
+  right="{{mode === 'view' ? '编辑' : '保存'}}"
+  bind:right-click="{{mode === 'view' ? 'toggleEdit' : 'saveEdit'}}"
+  left-arrow
+/>
+
+<view class="page">
+  <view class="day-container">
+
+    <!-- 图片区域 -->
+    <view class="upload box">
+      <t-upload
+        wx:if="{{mode === 'edit'}}"
+        t-class="upload-class"
+        media-type="{{['image']}}"
+        files="{{originFiles}}"
+        gridConfig="{{gridConfig}}"
+        bind:success="handleSuccess"
+        bind:remove="handleRemove"
+        max="9"
+      />
+
+      <block wx:else>
+        <view class="image-preview">
+          <image
+            wx:for="{{originFiles}}"
+            wx:key="url"
+            src="{{item.url}}"
+            mode="aspectFill"
+          />
+        </view>
+      </block>
+    </view>
+
+    <!-- 总结 -->
+    <view class="desc box">
+      <view class="desc-label">当天总结</view>
+
+      <t-textarea
+        wx:if="{{mode === 'edit'}}"
+        value="{{summary}}"
+        maxlength="500"
+        indicator
+        bind:change="onSummaryChange"
+      />
+
+      <view wx:else class="summary-text">
+        {{summary || '暂无总结'}}
+      </view>
+    </view>
+
+    <!-- 标签 -->
+    <view class="taggroup box">
+      <t-cell title="标签">
+        <block wx:for="{{tags}}" wx:key="index">
+          <t-check-tag
+            size="medium"
+            variant="dark"
+            checked
+            content="#{{item}}"
+            slot="note"
+          />
+        </block>
+      </t-cell>
+    </view>
+
+    <!-- 位置 -->
+    <view class="location box">
+      <t-cell
+        title="所在位置"
+        note="{{location || '未设置'}}"
+        arrow="{{mode === 'edit'}}"
+        bindtap="{{mode === 'edit' ? 'gotoMap' : ''}}"
+      />
+    </view>
+
+    <t-divider content="当天事件" />
+
+    <!-- 事件列表 -->
+    <view class="events box">
+      <block wx:for="{{events}}" wx:key="_id">
+        <block wx:if="{{!item._local || !item._local.isDeleted}}">
+        <view class="event-item">
+          <block wx:if="{{mode === 'view'}}">
+            <view class="event-title">{{item.title}}</view>
+            <view class="event-desc">{{item.description}}</view>
+            <view class="event-meta">{{item.time}} · {{item.status}}</view>
+          </block>
+          <block wx:else>
+            <t-input
+              value="{{item.title}}"
+              placeholder="事件标题"
+              data-index="{{index}}"
+              bind:change="onEventTitleChange"
+            />
+
+            <t-textarea
+              value="{{item.description}}"
+              placeholder="事件描述"
+              data-index="{{index}}"
+              bind:change="onEventDescChange"
+            />
+
+            <view class="event-row">
+              <t-input
+                value="{{item.time}}"
+                placeholder="时间"
+                data-index="{{index}}"
+                bind:change="onEventTimeChange"
+              />
+
+              <t-button
+                theme="danger"
+                size="small"
+                data-index="{{index}}"
+                bindtap="removeEvent"
+              >
+                删除
+              </t-button>
+            </view>
+          </block>
+        </view>
+      </block> 
+      </block>
+    </view>
+    <!-- 添加事件按钮 -->
+    <view>
+      <t-button
+        wx:if="{{mode === 'edit'}}"
+        theme="primary"
+        variant="outline"
+        bindtap="addEvent"
+      >
+        + 添加事件
+      </t-button>
+    </view>
+    <!-- 保存按钮（仅编辑态） -->
+    <view class="save-fab">
+      <t-button wx:if="{{mode === 'edit'}}"
+        shape="round"
+        theme="primary"
+        size="large"
+        bindtap="saveEdit"
+      >
+        保存
+      </t-button>
+    </view>
+    <!-- 右下角悬浮按钮 -->
+    <view class="fab">
+      <t-button
+        wx:if="{{mode === 'view'}}"
+        shape="round"
+        theme="primary"
+        size="large"
+        bindtap="enterEdit"
+      >
+        编辑
+      </t-button>
+
+      <t-button
+        wx:else
+        shape="round"
+        theme="danger"
+        size="large"
+        bindtap="cancelEdit"
+      >
+        取消
+      </t-button>
+    </view>
+  </view>
+ 
+</view>

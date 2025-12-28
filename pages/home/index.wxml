@@ -44,6 +44,9 @@
 
                       <block wx:for="{{item.events}}" wx:key="_id">
                         <view class="card-item"
+                        bindtap="goDayDetail"
+                        data-day-id="{{item.dayId}}"
+                        data-event-id="{{item._id}}"
                         >
                           <view class="title">{{item.title}}</view>
                           <view class="desc">{{item.description}}</view>
@@ -68,7 +71,10 @@
                       <view class="card-title">{{item.dayLabel}}</view>
 
                       <block wx:for="{{item.events}}" wx:key="_id">
-                        <view class="card-item">
+                        <view class="card-item"
+                        bindtap="goDayDetail"
+                        data-day-id="{{item.dayId}}"
+                        data-event-id="{{item._id}}">
                           <view class="title">{{item.title}}</view>
                           <view class="desc">{{item.description}}</view>
                         </view>

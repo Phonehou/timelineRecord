@@ -57,13 +57,21 @@ Page({
 
   goRelease() {
     wx.navigateTo({url:'/pages/release/index'});
-  }
-  //,
-  // goEventDetail(e) {
-  //   const { eventId, dayId } = e.currentTarget.dataset;
+  },
+  goDayDetail(e) {
+    const { dayId, eventId } = e.currentTarget.dataset;
+    console.log('dayId: ', e.currentTarget.dataset);
+    if (!dayId) {
+      console.error('dayId missing', e.currentTarget.dataset);
+      wx.showToast({
+        title: 'Day 数据异常',
+        icon: 'none'
+      });
+      return;
+    }
   
-  //   wx.navigateTo({
-  //     url: `/pages/dayDetail/index?eventId=${eventId}&dayId=${dayId}`,
-  //   });
-  // },
+    wx.navigateTo({
+      url: `/pages/dayDetail/index?dayId=${dayId}`
+    });
+  },
 });

@@ -2,6 +2,7 @@
   "pages": [
     "pages/home/index",
     "pages/message/index",
+    "pages/dayDetail/index",
     "pages/my/index"
   ],
   "usingComponents": {

@@ -71,6 +71,7 @@ function formatWeeks(days = [], events = []) {
     }
 
     weekMap[weekKey].days.push({
+      _id: day._id,
       date: day.date,
       dayLabel: day.dayLabel,
       //images: day.images || [],
@@ -81,6 +82,7 @@ function formatWeeks(days = [], events = []) {
         })),
       events: (eventMap[day._id] || []).map(e => ({
         _id: e._id,
+        dayId: day._id,
         title: e.title,
         description: e.description,
         time: e.time,
