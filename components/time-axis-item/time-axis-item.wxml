@@ -1,0 +1,14 @@
+<view class="time-axis-item">
+  <!-- 左侧轴线 -->
+  <view class="axis">
+    <view class="node">
+      <slot name="node"></slot>
+    </view>
+    <view class="line" wx:if="{{!isLast}}"></view>
+  </view>
+
+  <!-- 右侧内容 -->
+  <view class="content">
+    <slot name="content"></slot>
+  </view>
+</view>

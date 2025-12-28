@@ -1,0 +1,188 @@
+@import '/variable.less';
+
+@home-tab-item-height: 96rpx;
+
+.home-container {
+  height: calc(100vh - @tab-bar-height);
+
+  .home-content {
+    height: calc(100% - @nav-bar-height);
+  }
+
+  .t-tabs {
+    --td-tab-item-tag-height: @home-tab-item-height;
+    --td-tab-font-size: @font-size-small;
+    width: 100%;
+    height: 100%;
+
+    &__content {
+      height: calc(100% - @home-tab-item-height);
+      overflow: auto;
+      background-color: @bg-color;
+    }
+  }
+
+  .home-card-list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24rpx 12rpx;
+    padding: 24rpx;
+    background-color: @bg-color;
+  }
+}
+
+.home-release {
+  position: fixed;
+  bottom: 208rpx;
+  right: 32rpx;
+}
+
+/* 页面容器 */
+.home-container {
+  background: #f6f6f6;
+}
+
+/* 周列表 */
+.week-list {
+  padding: 160rpx 24rpx 24rpx; 
+}
+
+/* 周卡片 */
+.week-card {
+  margin-bottom: 40rpx;
+}
+
+.week-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+/* 天列表（纵向） */
+.day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* 天卡片 */
+.day-card {
+  padding: 24rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 天标题 */
+.day-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+/* 轮播图 */
+.day-swiper {
+  margin-bottom: 16rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+/* 事件列表 */
+.event-list card {
+  margin-bottom: 16rpx;
+}
+
+.timeline {
+  padding: 24rpx;
+}
+
+.week-header {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin: 32rpx 0 16rpx;
+}
+
+/* 一行时间轴 */
+.timeline-row {
+  display: flex;
+  position: relative;
+  min-height: 160rpx;
+}
+
+/* 左右 */
+.side {
+  width: 45%;
+  box-sizing: border-box;
+}
+
+.side.left {
+  text-align: right;
+  padding-right: 24rpx;
+}
+
+.side.right {
+  padding-left: 24rpx;
+}
+
+/* 中轴 */
+.axis {
+  width: 10%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.line {
+  width: 4rpx;
+  background: #e7e7e7;
+  flex: 1;
+}
+
+.dot {
+  position: absolute;
+  top: 32rpx;
+  width: 20rpx;
+  height: 20rpx;
+  background: #0052d9;
+  border-radius: 50%;
+}
+
+.date {
+  position: absolute;
+  top: -36rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22rpx;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,.06);
+}
+
+.card-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.card-item {
+  margin-bottom: 12rpx;
+}
+
+.title {
+  font-size: 24rpx;
+  color: #333;
+}
+
+.desc {
+  font-size: 22rpx;
+  color: #999;
+}

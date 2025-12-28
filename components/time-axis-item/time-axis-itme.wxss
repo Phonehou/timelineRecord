@@ -1,0 +1,39 @@
+.time-axis-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* 左侧轴 */
+.axis {
+  width: 48rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.node {
+  width: 32rpx;
+  height: 32rpx;
+  background-color: #0052d9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.line {
+  width: 2rpx;
+  flex: 1;
+  background-color: #dcdcdc;
+  margin-top: 4rpx;
+}
+
+/* 右侧内容 */
+.content {
+  flex: 1;
+  padding-left: 24rpx;
+  padding-bottom: 40rpx;
+}

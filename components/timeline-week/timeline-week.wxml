@@ -1,0 +1,12 @@
+<view class="week-container">
+  <view class="week-title">{{week}}</view>
+  <scroll-view scroll-x="true" class="day-list" enable-flex>
+    <timeline-day
+      wx:for="{{days}}"
+      wx:for-item="dayItem"
+      wx:key="date"    
+      day="{{dayItem.dayLabel}}"
+      events="{{dayItem.events}}"
+    />
+  </scroll-view>
+</view>

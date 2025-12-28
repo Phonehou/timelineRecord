@@ -1,0 +1,107 @@
+<nav nav-type="search" />
+<view class="home-container">
+  <view class="home-content">
+    <t-tabs defaultValue="recommend">
+      <t-tab-panel label="时间轴" value="recommend">
+        <!-- <t-pull-down-refresh
+          value="{{enable}}"
+          bind:refresh="onRefresh"
+          loadingTexts="{{['下拉刷新', '松手刷新', '正在刷新', '刷新完成']}}"
+        >
+          <view class="home-card-list" >
+            <t-swiper
+              list="{{swiperList}}"
+              navigation="{{ { type: 'dots-bar' } }}"
+              height="488rpx"
+              style="width: 340rpx"
+            />
+            <card
+              wx:for="{{cardInfo}}"
+              wx:key="index"
+              desc="{{item.desc}}"
+              url="{{item.url}}"
+              tags="{{item.tags}}"
+            />
+          </view>
+        </t-pull-down-refresh> -->
+        <view class="timeline">
+
+          <!-- 周 -->
+          <block wx:for="{{weeks}}" wx:key="weekLabel">
+            <view class="week-header">
+              {{item.weekLabel}}（{{item.weekStart}} ~ {{item.weekEnd}}）
+            </view>
+
+            <!-- 天 -->
+            <block wx:for="{{item.days}}" wx:key="date">
+              <view class="timeline-row">
+
+                <!-- 左侧内容 -->
+                <view class="side left">
+                  <block wx:if="{{index % 2 === 0}}">
+                    <view class="card">
+                      <view class="card-title">{{item.dayLabel}}</view>
+
+                      <block wx:for="{{item.events}}" wx:key="_id">
+                        <view class="card-item"
+                        >
+                          <view class="title">{{item.title}}</view>
+                          <view class="desc">{{item.description}}</view>
+                        </view>
+                      </block>
+                    </view>
+                  </block>
+                </view>
+
+                <!-- 中轴 -->
+                <view class="axis">
+                  <view class="line"></view>
+                  <view class="dot">
+                    <view class="date">{{item.date}}</view>
+                  </view>
+                </view>
+
+                <!-- 右侧内容 -->
+                <view class="side right">
+                  <block wx:if="{{index % 2 === 1}}">
+                    <view class="card">
+                      <view class="card-title">{{item.dayLabel}}</view>
+
+                      <block wx:for="{{item.events}}" wx:key="_id">
+                        <view class="card-item">
+                          <view class="title">{{item.title}}</view>
+                          <view class="desc">{{item.description}}</view>
+                        </view>
+                      </block>
+                    </view>
+                  </block>
+                </view>
+
+              </view>
+            </block>
+
+          </block>
+
+        </view>
+      </t-tab-panel>
+      <t-tab-panel label="我的关注" value="follow">
+        <view class="home-card-list">
+          <card
+            wx:for="{{focusCardInfo}}"
+            wx:key="index"
+            desc="{{item.desc}}"
+            url="{{item.url}}"
+            tags="{{item.tags}}"
+          />
+        </view>
+      </t-tab-panel>
+    </t-tabs>
+  </view>
+</view>
+
+<view class="home-release">
+  <t-button theme="primary" size="large" icon="add" shape="round" bindtap="goRelease">
+    发布
+  </t-button>
+</view>
+<t-message id="t-message" />

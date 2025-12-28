@@ -1,0 +1,5 @@
+__MACOSX
+cloudfunctions/**/node_modules/
+#cloudfunctions/**/package-lock.json
+project.private.config.json
+miniprogram_npm

@@ -1,0 +1,6 @@
+<view
+  class="tui-icon"
+  style="font-size: {{fontSize}};color: {{color}};font-weight: {{fontWeight}};"
+>
+  {{displayChar}}
+</view>

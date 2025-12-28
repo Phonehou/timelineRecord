@@ -1,0 +1,10 @@
+/* components/icon.wxss */.tui-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.bold {
+  font-weight: 700;
+}

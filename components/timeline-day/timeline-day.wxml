@@ -1,0 +1,9 @@
+<view class="day-card">
+  <view class="day-header">{{day}}</view>
+  <view class="event-list">
+    <view class="event-item" wx:for="{{events}}" wx:for-item="event" wx:key="_id">
+      <view class="event-title">{{event.title}}</view>
+      <view class="event-desc">{{event.description}}</view>
+    </view>
+  </view>
+</view>
