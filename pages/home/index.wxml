@@ -42,7 +42,7 @@
                     <view class="card" 
                     bindtap="goDayDetail" data-day-id="{{item._id}}">
                       <view class="card-title">{{item.dayLabel}}</view>
-
+                      <view class="desc">{{item.summary}}</view>
                       <block wx:for="{{item.events}}" wx:key="_id">
                         <view class="card-item"
                                         >
@@ -68,10 +68,10 @@
                     <view class="card"
                     bindtap="goDayDetail" data-day-id="{{item._id}}">
                       <view class="card-title">{{item.dayLabel}}</view>
-
+                      <view class="desc">{{item.summary}}</view>
                       <block wx:for="{{item.events}}" wx:key="_id">
                         <view class="card-item"
-                       >
+                       >        
                           <view class="title">{{item.title}}</view>
                           <view class="desc">{{item.description}}</view>
                         </view>

@@ -97,7 +97,42 @@ Page({
     }
   },
 
-  buildDayDiff() {
+  // async uploadImages(files) {
+  //   const uploads = files.map((file, index) => {
+  //     const ext = file.url.match(/\.\w+$/)?.[0] || '.jpg';
+  //     const cloudPath = `days/${Date.now()}_${index}${ext}`;
+  
+  //     return wx.cloud.uploadFile({
+  //       cloudPath,
+  //       filePath: file.url,
+  //     });
+  //   });
+  
+  //   const res = await Promise.all(uploads);
+  //   return res.map(r => r.fileID);
+  // },
+
+  uploadImages(files) {
+    const tasks = files.map((file, index) => {
+      const ext = file.url.match(/\.\w+$/)?.[0] || '.jpg';
+      const cloudPath = `days/${Date.now()}_${index}${ext}`;
+  
+      return wx.cloud.uploadFile({
+        cloudPath,
+        filePath: file.url
+      });
+    });
+  
+    return Promise.all(tasks).then(res =>
+      res.map(r => r.fileID)
+    );
+  },
+
+  getNeedUploadFiles(files) {
+    return files.filter(f => f.url.startsWith('http://tmp'));
+  },
+
+  async buildDayDiff() {
     const { summary, location, originFiles } = this.data;
     const dayDiff = {};
     const backup = this._backup?.day || {};
@@ -105,16 +140,45 @@ Page({
     if (summary !== backup.summary) dayDiff.summary = summary;
     // if (location !== backup.location) dayDiff.location = location;
     if (JSON.stringify(location) !== JSON.stringify(backup.location)) {
-      diff.location = location
+      dayDiff.location = location
     }
-    if (JSON.stringify(originFiles) !== JSON.stringify(backup.images)) {
-      dayDiff.images = originFiles.map((f, index) => ({
-        url: f.url,
-        type: f.type || 'image',
+    // const imageFileIds = await this.uploadImages(originFiles);
+    // if (JSON.stringify(originFiles) !== JSON.stringify(backup.images)) {
+      // dayDiff.images = originFiles.map((f, index) => ({
+      //   url: f.url,
+      //   type: f.type || 'image',
+      //   order: index
+      // }));
+    //  
+     // ===== images =====
+
+    // 1️⃣ 旧图片 cloud url 列表
+    const oldUrls = (backup.images || []).map(img => img.url);
+
+    // 2️⃣ 当前图片：区分 tmp / cloud
+    const needUpload = originFiles.filter(f => f.url.startsWith('http://tmp'));
+    const alreadyUploaded = originFiles.filter(f => f.url.startsWith('cloud://'));
+    
+    // 3️⃣ 上传新图片（只上传 tmp）
+    let uploadedFileIds = [];
+    if (needUpload.length > 0) {
+      uploadedFileIds = await this.uploadImages(needUpload);
+    }
+
+      // 4️⃣ 组装最终 url 列表（保持顺序）
+    const finalUrls = originFiles.map(f => {
+      if (f.url.startsWith('cloud://')) return f.url;
+      return uploadedFileIds.shift(); // 按顺序消费
+    });
+    // 5️⃣ diff 判断（核心）
+    if (JSON.stringify(finalUrls) !== JSON.stringify(oldUrls)) {
+      dayDiff.images = finalUrls.map((url, index) => ({
+        url,
+        type: 'image',
         order: index
       }));
     }
-  
+
     return dayDiff;
   },
   
@@ -266,7 +330,7 @@ Page({
   },
 
   async saveEdit() {
-    const dayUpdates = this.buildDayDiff();
+    const dayUpdates = await this.buildDayDiff();
     const { updates: eventUpdates, deletes: eventDeletes } = this.buildEventDiff();
 
     if (!Object.keys(dayUpdates).length && !eventUpdates.length && !eventDeletes.length) {

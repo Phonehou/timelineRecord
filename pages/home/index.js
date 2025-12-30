@@ -30,14 +30,14 @@ Page({
   async fetchTimeline() {
     try {
       console.log('callFunction timelines');
-      const res = await wx.cloud.callFunction({
-        name: 'get-timelines',
-        data: { timelineId: '8d4e1b05695153900127d4cb2ca36cba' }
-      });
       // const res = await wx.cloud.callFunction({
-      //   name: 'get-user-timelines',
+      //   name: 'get-timelines',
+      //   data: { timelineId: '8d4e1b05695153900127d4cb2ca36cba' }
       // });
-      // this.timelineId = res.result.data.timeline._id;
+      const res = await wx.cloud.callFunction({
+        name: 'get-user-timelines',
+      });
+      this.timelineId = res.result.data.timeline._id;
       console.log('receive timelines result', res);
        // 如果没有返回数据，提前处理
       if (!res.result || !res.result.data) {

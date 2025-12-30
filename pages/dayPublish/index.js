@@ -191,6 +191,36 @@ Page({
     const date = new Date(dateStr);
     return `周${days[date.getDay()]}`;
   },
+
+  // async uploadImages(files) {
+  //   const uploads = files.map((file, index) => {
+  //     const ext = file.url.match(/\.\w+$/)?.[0] || '.jpg';
+  //     const cloudPath = `days/${Date.now()}_${index}${ext}`;
+  
+  //     return wx.cloud.uploadFile({
+  //       cloudPath,
+  //       filePath: file.url,
+  //     });
+  //   });
+  
+  //   const res = await Promise.all(uploads);
+  //   return res.map(r => r.fileID);
+  // },
+  uploadImages(files) {
+    const tasks = files.map((file, index) => {
+      const ext = file.url.match(/\.\w+$/)?.[0] || '.jpg';
+      const cloudPath = `days/${Date.now()}_${index}${ext}`;
+  
+      return wx.cloud.uploadFile({
+        cloudPath,
+        filePath: file.url
+      });
+    });
+  
+    return Promise.all(tasks).then(res =>
+      res.map(r => r.fileID)
+    );
+  },
   /** 提交 Day + Events */
   async publishDay() {
     const { timescaleId, summary, originFiles, location, events, tags, date,
@@ -209,6 +239,7 @@ Page({
     try {
       wx.showLoading({ title: '发布中...' });
       loadingShown = true;
+      const imageFileIds = await this.uploadImages(originFiles);
       const payload = {
         timescaleId: this.data.timelineId || '',
         date,
@@ -217,9 +248,14 @@ Page({
         summary,
         location,
         tags,
-        images: originFiles.map((f, index) => ({
-          url: f.url,
-          type: f.type || 'image',
+        // images: originFiles.map((f, index) => ({
+        //   url: f.url,
+        //   type: f.type || 'image',
+        //   order: index
+        // })),
+        images: imageFileIds.map((fileID, index) => ({
+          url: fileID,          // ✅ cloud://
+          type: 'image',
           order: index
         })),
         events: events.map((e, index) => ({

@@ -74,6 +74,7 @@ function formatWeeks(days = [], events = []) {
       _id: day._id,
       date: day.date,
       dayLabel: day.dayLabel,
+      summary: day.summary,
       //images: day.images || [],
       images: (day.images || [])
         .sort((a, b) => (a.order || 0) - (b.order || 0))
