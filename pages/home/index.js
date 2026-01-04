@@ -7,7 +7,10 @@ Page({
     swiperList: [],
     cardInfo: [],
     weeks: [], // [{week:"周一", days:[{day:"12.9", events:[...]}, ...]}, ...]
-    timelineId: []
+    timelineId: [],
+     // ===== 我的关注 =====
+    followTimelines: [],
+    followLoaded: false,   // 是否已加载过
   },
 
   async onReady() {
@@ -27,6 +30,47 @@ Page({
     this.fetchTimeline();
   },
 
+  onTabChange(e) {
+    const { value } = e.detail;
+    console.log('tab change:', value);
+  
+    if (value === 'follow' && !this.data.followLoaded) {
+      this.fetchFollowTimelines();
+    }
+  },
+
+  async fetchFollowTimelines() {
+    try {
+      wx.showLoading({ title: '加载中...' });
+  
+      const res = await wx.cloud.callFunction({
+        name: 'get-followed-timescales'
+      });
+  
+      if (res.result?.code !== 0) {
+        wx.showToast({
+          title: res.result?.message || '加载失败',
+          icon: 'none'
+        });
+        return;
+      }
+  
+      this.setData({
+        followTimelines: res.result.data || [],
+        followLoaded: true
+      });
+  
+    } catch (err) {
+      console.error('fetchFollowTimelines error:', err);
+      wx.showToast({
+        title: '网络错误',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
   async fetchTimeline() {
     try {
       console.log('callFunction timelines');
@@ -37,7 +81,10 @@ Page({
       const res = await wx.cloud.callFunction({
         name: 'get-user-timelines',
       });
-      this.timelineId = res.result.data.timeline._id;
+      //this.timelineId = res.result.data.timeline._id;
+      this.setData({
+        timelineId: res.result.data.timeline._id
+      });
       console.log('receive timelines result', res);
        // 如果没有返回数据，提前处理
       if (!res.result || !res.result.data) {
@@ -70,9 +117,10 @@ Page({
   },
 
   goRelease() {
-    console.log("timelineId:", this.data.timelineId);
+    console.log("send to timelineId:", this.data.timelineId);
     wx.navigateTo({url:`/pages/dayPublish/index?timelineId=${this.data.timelineId}`});
   },
+
   goDayDetail(e) {
     const { dayId, eventId } = e.currentTarget.dataset;
     console.log('dayId: ', e.currentTarget.dataset);

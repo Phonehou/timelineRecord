@@ -2,7 +2,7 @@
 Page({
   data: {
     // ===== Day 数据 =====
-    timescaleId: '',
+    timelineId: '',
     originFiles: [],
     summary: '',
     tags: [],
@@ -22,7 +22,17 @@ Page({
     gridConfig: { column: 4, width: 160, height: 160 }
   },
 
-  onLoad() {},
+  onLoad(options) {
+    console.log('onLoad options:', options);
+  
+    if (options.timelineId) {
+      this.setData({
+        timelineId: options.timelineId
+      });
+    }
+  
+    console.log('timelineId in data:', this.data.timelineId);
+  },
 
   /** 上传图片 */
   handleSuccess(e) {
@@ -168,12 +178,6 @@ Page({
     });
   },
 
-  // computeWeekIndex(dateStr) {
-  //   const date = new Date(dateStr);
-  //   const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-  //   const dayOfYear = Math.floor((date - firstDayOfYear) / (24*60*60*1000)) + 1;
-  //   return Math.ceil(dayOfYear / 7);
-  // },
   computeWeekIndex(dateStr) {
     const date = new Date(dateStr);
     const d = new Date(Date.UTC(
@@ -192,20 +196,6 @@ Page({
     return `周${days[date.getDay()]}`;
   },
 
-  // async uploadImages(files) {
-  //   const uploads = files.map((file, index) => {
-  //     const ext = file.url.match(/\.\w+$/)?.[0] || '.jpg';
-  //     const cloudPath = `days/${Date.now()}_${index}${ext}`;
-  
-  //     return wx.cloud.uploadFile({
-  //       cloudPath,
-  //       filePath: file.url,
-  //     });
-  //   });
-  
-  //   const res = await Promise.all(uploads);
-  //   return res.map(r => r.fileID);
-  // },
   uploadImages(files) {
     const tasks = files.map((file, index) => {
       const ext = file.url.match(/\.\w+$/)?.[0] || '.jpg';
@@ -223,7 +213,7 @@ Page({
   },
   /** 提交 Day + Events */
   async publishDay() {
-    const { timescaleId, summary, originFiles, location, events, tags, date,
+    let { timelineId, summary, originFiles, location, events, tags, date,
       weekIndex,
       dayLabel } = this.data;
     if (!date) {
@@ -235,24 +225,37 @@ Page({
       return;
     }
     let loadingShown = false;
-    
+    if (!timelineId) {
+      // wx.showToast({
+      //   title: '请选择或创建时间轴',
+      //   icon: 'none'
+      // });
+      // return;
+      const res = await wx.cloud.callFunction({
+          name: 'create-timescale',
+        });
+        timelineId = res.result.data.timeline._id;
+    }
+    // if(!timelineId) {
+    //   console.log("timelineId received is empty, use user's own timescale.");
+    //   const res = await wx.cloud.callFunction({
+    //     name: 'get-user-timelines',
+    //   });
+    //   timelineId = res.result.data.timeline._id;
+    //   console.log('receive timelines result from get-user-timelines', res);
+    // }
     try {
       wx.showLoading({ title: '发布中...' });
       loadingShown = true;
       const imageFileIds = await this.uploadImages(originFiles);
       const payload = {
-        timescaleId: this.data.timelineId || '',
+        timelineId,
         date,
         weekIndex,
         dayLabel,
         summary,
         location,
         tags,
-        // images: originFiles.map((f, index) => ({
-        //   url: f.url,
-        //   type: f.type || 'image',
-        //   order: index
-        // })),
         images: imageFileIds.map((fileID, index) => ({
           url: fileID,          // ✅ cloud://
           type: 'image',

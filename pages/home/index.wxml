@@ -1,7 +1,7 @@
 <nav nav-type="search" />
 <view class="home-container">
   <view class="home-content">
-    <t-tabs defaultValue="recommend">
+    <t-tabs defaultValue="recommend" bind:change="onTabChange">
       <t-tab-panel label="时间轴" value="recommend">
         <!-- <t-pull-down-refresh
           value="{{enable}}"
@@ -25,77 +25,122 @@
           </view>
         </t-pull-down-refresh> -->
         <view class="timeline">
+          <!-- ✅ 空状态 -->
+          <view wx:if="{{!weeks || weeks.length === 0}}" class="timeline-empty">
+            <view class="empty-icon">🕰️</view>
+            <view class="empty-title">尚无时间轴</view>
+            <view class="empty-desc">记录你的第一天，时间才会开始流动</view>
 
-          <!-- 周 -->
-          <block wx:for="{{weeks}}" wx:key="weekLabel">
-            <view class="week-header">
-              {{item.weekLabel}}（{{item.weekStart}} ~ {{item.weekEnd}}）
-            </view>
+            <!-- <t-button
+              theme="primary"
+              shape="round"
+              size="medium"
+              bindtap="goRelease"
+            >
+              立即发布
+            </t-button> -->
+          </view>
 
-            <!-- 天 -->
-            <block wx:for="{{item.days}}" wx:key="date">
-              <view class="timeline-row">
-
-                <!-- 左侧内容 -->
-                <view class="side left">
-                  <block wx:if="{{index % 2 === 0}}">
-                    <view class="card" 
-                    bindtap="goDayDetail" data-day-id="{{item._id}}">
-                      <view class="card-title">{{item.dayLabel}}</view>
-                      <view class="desc">{{item.summary}}</view>
-                      <block wx:for="{{item.events}}" wx:key="_id">
-                        <view class="card-item"
-                                        >
-                          <view class="title">{{item.title}}</view>
-                          <view class="desc">{{item.description}}</view>
-                        </view>
-                      </block>
-                    </view>
-                  </block>
-                </view>
-
-                <!-- 中轴 -->
-                <view class="axis">
-                  <view class="line"></view>
-                  <view class="dot">
-                    <view class="date">{{item.date}}</view>
-                  </view>
-                </view>
-
-                <!-- 右侧内容 -->
-                <view class="side right">
-                  <block wx:if="{{index % 2 === 1}}">
-                    <view class="card"
-                    bindtap="goDayDetail" data-day-id="{{item._id}}">
-                      <view class="card-title">{{item.dayLabel}}</view>
-                      <view class="desc">{{item.summary}}</view>
-                      <block wx:for="{{item.events}}" wx:key="_id">
-                        <view class="card-item"
-                       >        
-                          <view class="title">{{item.title}}</view>
-                          <view class="desc">{{item.description}}</view>
-                        </view>
-                      </block>
-                    </view>
-                  </block>
-                </view>
-
+          <!-- ✅ 正常时间轴 -->
+          <block wx:else>
+            <!-- 周 -->
+            <block wx:for="{{weeks}}" wx:key="weekLabel">
+              <view class="week-header">
+                {{item.weekLabel}}（{{item.weekStart}} ~ {{item.weekEnd}}）
               </view>
+
+              <!-- 天 -->
+              <block wx:for="{{item.days}}" wx:key="date">
+                <view class="timeline-row">
+
+                  <!-- 左侧内容 -->
+                  <view class="side left">
+                    <block wx:if="{{index % 2 === 0}}">
+                      <view class="card" 
+                      bindtap="goDayDetail" data-day-id="{{item._id}}">
+                        <view class="card-title">{{item.dayLabel}}</view>
+                        <view class="desc">{{item.summary}}</view>
+                        <block wx:for="{{item.events}}" wx:key="_id">
+                          <view class="card-item"
+                                          >
+                            <view class="title">{{item.title}}</view>
+                            <view class="desc">{{item.description}}</view>
+                          </view>
+                        </block>
+                      </view>
+                    </block>
+                  </view>
+
+                  <!-- 中轴 -->
+                  <view class="axis">
+                    <view class="line"></view>
+                    <view class="dot">
+                      <view class="date">{{item.date}}</view>
+                    </view>
+                  </view>
+
+                  <!-- 右侧内容 -->
+                  <view class="side right">
+                    <block wx:if="{{index % 2 === 1}}">
+                      <view class="card"
+                      bindtap="goDayDetail" data-day-id="{{item._id}}">
+                        <view class="card-title">{{item.dayLabel}}</view>
+                        <view class="desc">{{item.summary}}</view>
+                        <block wx:for="{{item.events}}" wx:key="_id">
+                          <view class="card-item"
+                        >        
+                            <view class="title">{{item.title}}</view>
+                            <view class="desc">{{item.description}}</view>
+                          </view>
+                        </block>
+                      </view>
+                    </block>
+                  </view>
+
+                </view>
+              </block>
+
             </block>
-
           </block>
-
         </view>
       </t-tab-panel>
+   
       <t-tab-panel label="我的关注" value="follow">
         <view class="home-card-list">
-          <card
-            wx:for="{{focusCardInfo}}"
-            wx:key="index"
-            desc="{{item.desc}}"
-            url="{{item.url}}"
-            tags="{{item.tags}}"
-          />
+
+          <block wx:if="{{followTimelines.length}}">
+            <view
+              class="focus-card"
+              wx:for="{{followTimelines}}"
+              wx:key="_id"
+              bindtap="goTimeline"
+              data-id="{{item._id}}"
+            >
+              <view class="title">{{item.title}}</view>
+
+              <view class="desc">
+                {{item.description || '暂无简介'}}
+              </view>
+
+              <view class="meta">
+                <text class="role">
+                  {{item.role === 'editor' ? '协作者' : '已关注'}}
+                </text>
+                <!-- <text class="count">
+                  {{item.memberCount}} 人
+                </text> -->
+              </view>
+
+              <view wx:if="{{item.latestDay}}" class="latest">
+                最近更新：{{item.latestDay.summary}}
+              </view>
+            </view>
+          </block>
+
+          <view wx:else class="empty">
+            <text>你还没有关注任何时间轴</text>
+          </view>
+        
         </view>
       </t-tab-panel>
     </t-tabs>
