@@ -1,0 +1,71 @@
+<!-- <nav title-text="管理时间轴" /> -->
+<t-navbar
+  title="管理时间轴"
+  left-arrow
+/>
+<view class="manage-page">
+
+  <!-- 顶部操作栏 -->
+  <!-- <view class="header">
+    <t-button theme="primary" icon="add" shape="round" bindtap="onCreateTimeline">
+      新建时间轴
+    </t-button>
+  </view> -->
+
+  <!-- Tabs：我创建的 / 我协作的 -->
+  <t-tabs value="{{activeTab}}" bind:change="onTabChange">
+
+    <!-- 我创建的 -->
+    <t-tab-panel label="我创建的" value="own">
+      <block wx:if="{{ownerList.length}}">
+        <view class="timeline-list">
+          <block wx:for="{{ownerList}}" wx:key="_id">
+            <view class="timeline-card">
+              <view class="card-main" bindtap="goTimeline" data-id="{{item._id}}">
+                <view class="title">{{item.title}}</view>
+                <view class="desc">{{item.description || '暂无描述'}}</view>
+                <!-- <view class="meta">
+                  <text>{{item.dayCount}} 天</text>
+                  <text>{{item.memberCount}} 人</text>
+                </view> -->
+              </view>
+
+              <view class="card-actions">
+                <t-icon name="edit" bindtap="onEdit" data-id="{{item._id}}" />
+                <t-icon name="delete" bindtap="onDelete" data-id="{{item._id}}" />
+              </view>
+            </view>
+          </block>
+        </view>
+      </block>
+
+      <view wx:else class="empty">
+        <text>你还没有创建时间轴</text>
+        <text class="sub">创建一个，开始记录你的时间</text>
+      </view>
+    </t-tab-panel>
+
+    <!-- 我协作的 -->
+    <t-tab-panel label="我协作的" value="collab">
+      <block wx:if="{{collabList.length}}">
+        <view class="timeline-list">
+          <block wx:for="{{collabList}}" wx:key="_id">
+            <view class="timeline-card" bindtap="goTimeline" data-id="{{item._id}}">
+              <view class="title">{{item.title}}</view>
+              <view class="desc">{{item.description || '暂无描述'}}</view>
+              <view class="meta">
+                <text>创建者：{{item.creatorId}}</text>
+                <!-- <text class="role">协作者</text> -->
+              </view>
+            </view>
+          </block>
+        </view>
+      </block>
+
+      <view wx:else class="empty">
+        <text>你还没有参与任何时间轴</text>
+      </view>
+    </t-tab-panel>
+
+  </t-tabs>
+</view>

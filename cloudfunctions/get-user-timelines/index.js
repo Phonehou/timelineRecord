@@ -102,7 +102,7 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
   console.log("openid:", openid);
-  // 1️⃣ 查询用户时间轴
+
   const timelineRes = await db.collection('timescales')
     .where({ creatorId: openid, status: 'active' })
     .limit(1)

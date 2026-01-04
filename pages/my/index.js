@@ -10,10 +10,10 @@ Page({
     personalInfo: {},
     gridList: [
       {
-        name: '全部发布',
+        name: '时间轴',
         icon: 'root-list',
-        type: 'all',
-        url: '',
+        type: 'timeline',
+        url: '/pages/timelineManage/index',
       },
       {
         name: '审核中',
@@ -79,9 +79,19 @@ Page({
     wx.navigateTo({ url: `/pages/my/info-edit/index` });
   },
 
+  // onEleClick(e) {
+  //   const { name, url } = e.currentTarget.dataset.data;
+  //   if (url) return;
+  //   this.onShowToast('#t-toast', name);
+  // },
   onEleClick(e) {
     const { name, url } = e.currentTarget.dataset.data;
-    if (url) return;
-    this.onShowToast('#t-toast', name);
-  },
+  
+    if (url) {
+      wx.navigateTo({ url });
+      return;
+    }
+  
+    this.onShowToast('#t-toast', `${name} 功能开发中`);
+  }
 });

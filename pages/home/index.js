@@ -73,6 +73,8 @@ Page({
 
   async fetchTimeline() {
     try {
+      wx.showLoading({ title: '加载中...' });
+
       console.log('callFunction timelines');
       // const res = await wx.cloud.callFunction({
       //   name: 'get-timelines',
@@ -85,6 +87,7 @@ Page({
       this.setData({
         timelineId: res.result.data.timeline._id
       });
+      wx.hideLoading();
       console.log('receive timelines result', res);
        // 如果没有返回数据，提前处理
       if (!res.result || !res.result.data) {

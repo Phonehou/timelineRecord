@@ -27,7 +27,7 @@
         <view class="timeline">
           <!-- ✅ 空状态 -->
           <view wx:if="{{!weeks || weeks.length === 0}}" class="timeline-empty">
-            <view class="empty-icon">🕰️</view>
+            <!-- <view class="empty-icon">🕰️</view> -->
             <view class="empty-title">尚无时间轴</view>
             <view class="empty-desc">记录你的第一天，时间才会开始流动</view>
 

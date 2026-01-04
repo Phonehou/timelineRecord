@@ -4,7 +4,8 @@
     "pages/message/index",
     "pages/dayDetail/index",
     "pages/my/index",
-    "pages/dayPublish/index"
+    "pages/dayPublish/index",
+    "pages/timelineManage/index"
   ],
   "usingComponents": {
     "t-toast": "tdesign-miniprogram/toast/toast"
